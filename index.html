@@ -30,9 +30,9 @@
     }
 
     // Initialize custom elements
-    import SomeElement from "./js/app.js";
-    customElements.define("some-element", SomeElement);
-    
+    import TodoList from "./js/app.js";
+    customElements.define("some-element", TodoList);
+
     // Initialize database
     const db = new PouchDB('kittens');
     db.changes({ include_docs: true, live: true }).on('change', function(changes) {
@@ -48,10 +48,10 @@
         customElement.setRemoveCallback(function(id) {
             db.get(id).then(function(x) {
                 return db.remove(x);
-            })        
+            })
         })
     }
-    
+
     // Add submission action
     let addButton = document.getElementById('make-entry');
     if (addButton) {
@@ -66,9 +66,9 @@
                     ).then(function(d) {
                         console.log("inserted");
                         inputField.value = '';
-                    })                    
+                    })
                 }
-            }            
+            }
         });
     }
 </script>
