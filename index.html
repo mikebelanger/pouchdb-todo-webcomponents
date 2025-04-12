@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<head>
+<link rel="stylesheet" href="./styles/site.css" type="text/css">
+<link rel="stylesheet" href="./styles/pico.min.css" type="text/css">
+<script src="./js/pouchdb-9.0.0.js"></script>
+<script src="./js/app.js" type="module"></script>
+</head>
+<body>
+    <main class="container">
+        <h2>Todo List</h2>
+    <form>
+        <fieldset role="group">
+            <input name="item" id="input-name" type="text" autocomplete="off"></input>
+            <input id="make-entry" type="submit" value="Add item"></button>
+        </fieldset>
+        <some-element id="some-elementdb" message="Hellooo!"></some-element>
+    </form>
+    </main>
+</body>
+<script type="module">
+    // Generates a new database entry
+    function newEntry(name, age) {
+        return {
+            _id: new Date().getTime().toString(),
+            name,
+            occupation: 'random',
+            age,
+            hobbies: []
+        }
+    }
+
+    // Initialize custom elements
+    import SomeElement from "./js/app.js";
+    customElements.define("some-element", SomeElement);
+    
+    // Initialize database
+    const db = new PouchDB('kittens');
+    db.changes({ include_docs: true, live: true }).on('change', function(changes) {
+        if (customElement && !changes.deleted) {
+            customElement.addItem(changes.doc.name, changes.doc._id);
+            customElement.render();
+        }
+    });
+
+    // Add a remove item callback
+    let customElement = document.getElementById('some-elementdb');
+    if (customElement) {
+        customElement.setRemoveCallback(function(id) {
+            db.get(id).then(function(x) {
+                return db.remove(x);
+            })        
+        })
+    }
+    
+    // Add submission action
+    let addButton = document.getElementById('make-entry');
+    if (addButton) {
+        addButton.addEventListener('click', function(data) {
+            let inputField = document.getElementById('input-name');
+            if (inputField) {
+                let value = document.getElementById('input-name').value;
+
+                if (value.length > 0) {
+                    db.put(
+                        newEntry(value, Math.random() * 100)
+                    ).then(function(d) {
+                        console.log("inserted");
+                        inputField.value = '';
+                    })                    
+                }
+            }            
+        });
+    }
+</script>
+</html>
