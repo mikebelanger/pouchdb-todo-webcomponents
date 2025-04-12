@@ -7,3 +7,8 @@ Seeing how far I can get with just [PouchDB](https://pouchdb.com/) and some [Cus
 Download this repo, and http-serve from the root of your repo. I'm using [basic-http-server](https://github.com/brson/basic-http-server), but anything that can serve an index.html will work. [http-serve](https://www.npmjs.com/package/http-server) works too.  Loading the index.html file directly from your filesystem **won't work**, and will trigger a CORS error.
 
 Open it up in the browser, and start adding items. Click on items to remove them (I gotta make that more obvious). Hit refresh.  Note how you get persistence with so little code.
+
+# Known Issues (TODO)
+
+- [ ] Re-rendering list items is O(N). Find some way to lazily render them.
+- [ ] Icon on hover for styling
