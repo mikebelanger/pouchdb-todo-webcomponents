@@ -1,27 +1,15 @@
-const ListItem = (item, id) => {
-  const el = document.createElement("li");
-  el.textContent = item;
-  el.id = id;
-  return el;
-};
-
 class TodoList extends HTMLElement {
   static observedAttributes = ["message"];
   constructor() {
     super();
     this.message = "";
     this.items = [];
-    this.removeCallback = (name, id) => {};
+    this.removeCallback = (id) => {};
   }
   render() {
     this.innerHTML = "";
     this.items.forEach((item, index) => {
-      const li = ListItem(item.name, item.id);
-      li.addEventListener("click", () => {
-        this.items.splice(index, 1);
-        this.removeCallback(item.id);
-        this.render();
-      });
+      const li = this.generateItem(item.name, item.id);
       this.appendChild(li);
     });
   }
@@ -35,10 +23,30 @@ class TodoList extends HTMLElement {
   }
   addItem(name, id) {
     this.items.push({ name, id });
+    const newItem = this.generateItem(name, id);
+    this.appendChild(newItem);
+  }
+  removeItem(id) {
+    const index = this.items.findIndex((x) => x.id === id);
+    if (index > -1) {
+      this.items.splice(index, 1);
+      this.removeChild(this.children[id]);
+      this.removeCallback(id);
+    }
   }
   setRemoveCallback(fn) {
     this.removeCallback = fn;
   }
+  generateItem = (item, id) => {
+    const el = document.createElement("li");
+    el.textContent = item;
+    el.id = id;
+    el.addEventListener("click", () => {
+      this.removeItem(id);
+    });
+    return el;
+  };
+
 }
 
 export default TodoList;

@@ -38,7 +38,6 @@
     db.changes({ include_docs: true, live: true }).on('change', function(changes) {
         if (customElement && !changes.deleted) {
             customElement.addItem(changes.doc.name, changes.doc._id);
-            customElement.render();
         }
     });
 

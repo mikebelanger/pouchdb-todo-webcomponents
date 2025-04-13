@@ -10,5 +10,5 @@ Open it up in the browser, and start adding items. Click on items to remove them
 
 # Known Issues (TODO)
 
-- [ ] Re-rendering list items is O(N). Find some way to lazily render them.
+- [x] Re-rendering list items is O(N). Find some way to lazily render them.
 - [ ] Icon on hover for styling
