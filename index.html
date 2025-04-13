@@ -13,7 +13,7 @@
             <input name="item" id="input-name" type="text" autocomplete="off"></input>
             <input id="make-entry" type="submit" value="Add item"></button>
         </fieldset>
-        <some-element id="some-elementdb" message="Hellooo!"></some-element>
+        <todo-list id="some-elementdb" message="Hellooo!"></todo-list>
     </form>
     </main>
 </body>
@@ -31,7 +31,7 @@
 
     // Initialize custom elements
     import TodoList from "./js/app.js";
-    customElements.define("some-element", TodoList);
+    customElements.define("todo-list", TodoList);
 
     // Initialize database
     const db = new PouchDB('kittens');

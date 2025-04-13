@@ -1,3 +1,8 @@
+const randomID = () => {
+  const randomTime = new Date().getTime();
+  return `${Math.random() * randomTime}`;
+}
+
 class TodoList extends HTMLElement {
   static observedAttributes = ["message"];
   constructor() {
@@ -5,13 +10,22 @@ class TodoList extends HTMLElement {
     this.message = "";
     this.items = [];
     this.removeCallback = (id) => {};
+    this.rootID = randomID();
   }
   render() {
-    this.innerHTML = "";
+    this.innerHTML = this.generateUL(this.rootID).outerHTML;
     this.items.forEach((item, index) => {
       const li = this.generateItem(item.name, item.id);
-      this.appendChild(li);
+      this.getRoot().appendChild(li);
     });
+  }
+  generateUL(id) {
+    const ul = document.createElement("ul");
+    ul.setAttribute("id", id);
+    return ul;
+  }
+  getRoot() {
+    return this.children[this.rootID];
   }
   connectedCallback() {
     this.render();
@@ -24,13 +38,13 @@ class TodoList extends HTMLElement {
   addItem(name, id) {
     this.items.push({ name, id });
     const newItem = this.generateItem(name, id);
-    this.appendChild(newItem);
+    this.getRoot().appendChild(newItem);
   }
   removeItem(id) {
     const index = this.items.findIndex((x) => x.id === id);
     if (index > -1) {
       this.items.splice(index, 1);
-      this.removeChild(this.children[id]);
+      this.getRoot().removeChild(this.getRoot().children[id]);
       this.removeCallback(id);
     }
   }
