@@ -20,7 +20,7 @@ class TodoList extends HTMLElement {
     });
   }
   generateUL(id) {
-    const ul = document.createElement("ul");
+    const ul = document.createElement("fieldset");
     ul.setAttribute("id", id);
     return ul;
   }
@@ -52,13 +52,18 @@ class TodoList extends HTMLElement {
     this.removeCallback = fn;
   }
   generateItem = (item, id) => {
-    const el = document.createElement("li");
-    el.textContent = item;
-    el.id = id;
-    el.addEventListener("click", () => {
+    const checkboxLabelContainer = document.createElement("label");
+    checkboxLabelContainer.id = id;
+    const checkbox = document.createElement("input");
+    const text = document.createTextNode(item);
+    checkbox.type = "checkbox";
+    checkbox.name = item;
+    checkbox.addEventListener("click", () => {
       this.removeItem(id);
     });
-    return el;
+    checkboxLabelContainer.appendChild(checkbox);
+    checkboxLabelContainer.appendChild(text);
+    return checkboxLabelContainer;
   };
 
 }
