@@ -13,13 +13,13 @@ class TodoList extends HTMLElement {
     this.rootID = randomID();
   }
   render() {
-    this.innerHTML = this.generateUL(this.rootID).outerHTML;
+    this.innerHTML = this.generateRoot(this.rootID).outerHTML;
     this.items.forEach((item, index) => {
       const li = this.generateItem(item.name, item.id);
       this.getRoot().appendChild(li);
     });
   }
-  generateUL(id) {
+  generateRoot(id) {
     const ul = document.createElement("fieldset");
     ul.setAttribute("id", id);
     return ul;
@@ -51,18 +51,19 @@ class TodoList extends HTMLElement {
   setRemoveCallback(fn) {
     this.removeCallback = fn;
   }
-  generateItem = (item, id) => {
+  generateItem = (item, id, checked) => {
     const checkboxLabelContainer = document.createElement("label");
     checkboxLabelContainer.id = id;
-    const checkbox = document.createElement("input");
-    const text = document.createTextNode(item);
-    checkbox.type = "checkbox";
-    checkbox.name = item;
-    checkbox.addEventListener("click", () => {
+
+    let inputId = `${id}-input`;
+    checkboxLabelContainer.innerHTML = `
+      <input type="checkbox" name="${item}" id="${inputId}" />
+      ${item}
+    `;
+
+    checkboxLabelContainer.children[inputId].addEventListener("click", () => {
       this.removeItem(id);
     });
-    checkboxLabelContainer.appendChild(checkbox);
-    checkboxLabelContainer.appendChild(text);
     return checkboxLabelContainer;
   };
 
