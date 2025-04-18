@@ -60,22 +60,6 @@
                     ))
             });
         
-        // Setup live event listener
-        // db.changes(options)
-        //     .on('change', function(change) {
-        //         if (change.deleted) {
-        //             todoList.updateTodo(change.doc.name, change.id, change.deleted);
-        //         } else {
-        //             todoList.addTodo(change.doc.name, change.id, change.deleted);   
-        //         }
-        //     });
-        
-        // Add a remove item callback
-        // todoList.setFinishTodoCallback(function(id) {
-        //     db.get(id).then(function(x) {
-        //         return db.remove(x);
-        //     })
-        // })
         // Adds callback for finishing a todo item
         todoList.setCheckTodoCallback(function(id, done) {
             db.get(id).then(function(todo) {
@@ -93,7 +77,11 @@
         
         if (clearButton) {
             clearButton.addEventListener("click", function(event) {
-                todoList.render(); 
+                todoList.removeDoneTodos((id) => {
+                    db.get(id).then(function(doc) {
+                        return db.remove(doc);
+                    })
+                }); 
             });
         }
         // Add submission action
@@ -109,7 +97,7 @@
                     if (value.length > 0) {
                         db.put(entry)
                             .then(function(d) {
-inputField.value = '';
+                                inputField.value = '';
                                 todoList.addTodo(entry.name, entry._id, entry.done);
                             })
                     }

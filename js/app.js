@@ -66,6 +66,14 @@ class TodoList extends HTMLElement {
     });
     return checkboxLabelContainer;
   };
+  removeDoneTodos(cb) {
+    Array.from(this.getRoot().children).forEach((n) => {
+      if (n.control.checked) {
+        cb(n.id);
+        this.removeTodo(n.id);
+      }
+    });
+  }
 
 }
 
