@@ -11,9 +11,9 @@
     <form>
         <fieldset role="group">
             <input name="item" id="input-name" type="text" autocomplete="off"></input>
-            <button id="make-entry" value="Add">Add</button>
+            <button id="add-todo" value="Add">Add</button>
         </fieldset>
-        <todo-list id="some-elementdb" message="Hellooo!"></todo-list>
+        <todo-list id="todo-list-container"></todo-list>
     </form>
     <button id="clear-done" class="contrast">Clear done items</button>
     </main>
@@ -37,8 +37,8 @@
     customElements.define("todo-list", TodoList);
 
     // Initialize database
-    const db = new PouchDB('kittens');
-    const todoList = document.getElementById('some-elementdb');
+    const db = new PouchDB('todo-list');
+    const todoList = document.getElementById('todo-list-container');
 
     // DB options
     const options = {
@@ -85,7 +85,7 @@
             });
         }
         // Add submission action
-        const addButton = document.getElementById('make-entry');
+        const addButton = document.getElementById('add-todo');
         if (addButton) {
             addButton.addEventListener('click', function(event) {
                 event.preventDefault();
