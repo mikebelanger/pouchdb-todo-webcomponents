@@ -11,13 +11,16 @@
     <form>
         <fieldset role="group">
             <input name="item" id="input-name" type="text" autocomplete="off"></input>
-            <input id="make-entry" type="submit" value="Add item"></button>
+            <button id="make-entry" value="Add">Add</button>
         </fieldset>
         <todo-list id="some-elementdb" message="Hellooo!"></todo-list>
     </form>
+    <button id="clear-done" class="contrast">Clear done items</button>
     </main>
 </body>
 <script type="module">
+    import TodoList from "./js/app.js";
+    
     // Generates a new database entry
     function newEntry(name, age) {
         return {
@@ -25,50 +28,94 @@
             name,
             occupation: 'random',
             age,
-            hobbies: []
+            hobbies: [],
+            done: false,
         }
     }
 
     // Initialize custom elements
-    import TodoList from "./js/app.js";
     customElements.define("todo-list", TodoList);
 
     // Initialize database
     const db = new PouchDB('kittens');
-    db.changes({ include_docs: true, live: true }).on('change', function(changes) {
-        if (customElement && !changes.deleted) {
-            customElement.addItem(changes.doc.name, changes.doc._id);
-        }
-    });
+    const todoList = document.getElementById('some-elementdb');
 
-    // Add a remove item callback
-    let customElement = document.getElementById('some-elementdb');
-    if (customElement) {
-        customElement.setRemoveCallback(function(id) {
-            db.get(id).then(function(x) {
-                return db.remove(x);
+    // DB options
+    const options = {
+        include_docs: true,
+        live: true,
+        since: 'now'
+    };
+    
+    if (todoList) {
+        // Used to render all initial documents
+        db.allDocs({ include_docs: true })
+            .then(function(result) {
+                todoList.render(
+                    result.rows
+                        .map((x) => {
+                            const { done, name } = x.doc;
+                            return { id: x.id, name, done }
+                        }
+                    ))
+            });
+        
+        // Setup live event listener
+        // db.changes(options)
+        //     .on('change', function(change) {
+        //         if (change.deleted) {
+        //             todoList.updateTodo(change.doc.name, change.id, change.deleted);
+        //         } else {
+        //             todoList.addTodo(change.doc.name, change.id, change.deleted);   
+        //         }
+        //     });
+        
+        // Add a remove item callback
+        // todoList.setFinishTodoCallback(function(id) {
+        //     db.get(id).then(function(x) {
+        //         return db.remove(x);
+        //     })
+        // })
+        // Adds callback for finishing a todo item
+        todoList.setCheckTodoCallback(function(id, done) {
+            db.get(id).then(function(todo) {
+                todo.done = done;
+
+                // Update element here
+                todoList.updateTodo(todo.name, todo._id, todo.done);
+                
+                return db.put(todo);
             })
         })
-    }
-
-    // Add submission action
-    let addButton = document.getElementById('make-entry');
-    if (addButton) {
-        addButton.addEventListener('click', function(data) {
-            let inputField = document.getElementById('input-name');
-            if (inputField) {
-                let value = document.getElementById('input-name').value;
-
-                if (value.length > 0) {
-                    db.put(
-                        newEntry(value, Math.random() * 100)
-                    ).then(function(d) {
-                        console.log("inserted");
-                        inputField.value = '';
-                    })
+            
+        // Add clear item mechanic
+        const clearButton = document.getElementById('clear-done');
+        
+        if (clearButton) {
+            clearButton.addEventListener("click", function(event) {
+                todoList.render(); 
+            });
+        }
+        // Add submission action
+        const addButton = document.getElementById('make-entry');
+        if (addButton) {
+            addButton.addEventListener('click', function(event) {
+                event.preventDefault();
+                let inputField = document.getElementById('input-name');
+                if (inputField) {
+                    let value = document.getElementById('input-name').value;
+                    let entry = newEntry(value, Math.random() * 100);
+    
+                    if (value.length > 0) {
+                        db.put(entry)
+                            .then(function(d) {
+inputField.value = '';
+                                todoList.addTodo(entry.name, entry._id, entry.done);
+                            })
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 </script>
 </html>

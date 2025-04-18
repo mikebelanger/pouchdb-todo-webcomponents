@@ -3,21 +3,28 @@ const randomID = () => {
   return `${Math.random() * randomTime}`;
 }
 
+const renderTodo = (text, id, checked) => {
+  return `
+    <input type="checkbox" name="${text}" 
+      id="${id}" ${checked ? 'checked' : ''} />
+      ${checked ? `<s>${text}</s>` : `${text}`}`;
+}
+
 class TodoList extends HTMLElement {
-  static observedAttributes = ["message"];
   constructor() {
     super();
-    this.message = "";
-    this.items = [];
-    this.removeCallback = (id) => {};
+    this.checkTodoCallback = (id, done) => {};
     this.rootID = randomID();
   }
-  render() {
+  render(items = []) {
     this.innerHTML = this.generateRoot(this.rootID).outerHTML;
-    this.items.forEach((item, index) => {
-      const li = this.generateItem(item.name, item.id);
-      this.getRoot().appendChild(li);
+    items.forEach((item, index) => {
+      const todo = this.newTodo(item.name, item.id, item.done);
+      this.getRoot().appendChild(todo);
     });
+  }
+  connectedCallback() {
+    this.render();
   }
   generateRoot(id) {
     const ul = document.createElement("fieldset");
@@ -27,42 +34,35 @@ class TodoList extends HTMLElement {
   getRoot() {
     return this.children[this.rootID];
   }
-  connectedCallback() {
-    this.render();
+  addTodo(name, id, done) {
+    const newTodo = this.newTodo(name, id, done);
+    this.getRoot().appendChild(newTodo);
   }
-  attributeChangedCallback(name, oldValue, newValue) {
-    if (name === "message") {
-      this.message = newValue;
+  updateTodo(name, id, done) {
+    const currentItem = this.getRoot().children[id];
+    const newItem = this.newTodo(name, id, done);
+    this.getRoot().replaceChild(newItem, currentItem);
+  }
+  removeTodo(id) {
+    const targetChild = this.getRoot().children[id];
+
+    if (targetChild){
+       this.getRoot().removeChild(targetChild); 
     }
   }
-  addItem(name, id) {
-    this.items.push({ name, id });
-    const newItem = this.generateItem(name, id);
-    this.getRoot().appendChild(newItem);
+  setCheckTodoCallback(fn) {
+    this.checkTodoCallback = fn;
   }
-  removeItem(id) {
-    const index = this.items.findIndex((x) => x.id === id);
-    if (index > -1) {
-      this.items.splice(index, 1);
-      this.getRoot().removeChild(this.getRoot().children[id]);
-      this.removeCallback(id);
-    }
-  }
-  setRemoveCallback(fn) {
-    this.removeCallback = fn;
-  }
-  generateItem = (item, id, checked) => {
+  newTodo = (item, id, checked) => {
     const checkboxLabelContainer = document.createElement("label");
     checkboxLabelContainer.id = id;
 
     let inputId = `${id}-input`;
-    checkboxLabelContainer.innerHTML = `
-      <input type="checkbox" name="${item}" id="${inputId}" />
-      ${item}
-    `;
+    checkboxLabelContainer.innerHTML = renderTodo(item, inputId, checked);
+    let checkbox = checkboxLabelContainer.children[inputId]; 
 
-    checkboxLabelContainer.children[inputId].addEventListener("click", () => {
-      this.removeItem(id);
+    checkbox.addEventListener("change", () => {
+      this.checkTodoCallback(id, checkbox.checked);
     });
     return checkboxLabelContainer;
   };
