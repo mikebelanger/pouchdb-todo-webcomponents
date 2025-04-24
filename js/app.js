@@ -74,7 +74,9 @@ class TodoList extends HTMLElement {
       }
     });
   }
-
+  getCheckedItems = () => {
+    return Array.from(this.getRoot().getElementsByTagName("input")).map((x) => x.checked)
+  }
 }
 
 export default TodoList;

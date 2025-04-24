@@ -58,6 +58,14 @@
                             return { id: x.id, name, done }
                         }
                     ))
+            }).then(function() {
+                const clearButton = document.getElementById('clear-done');
+
+                if (clearButton) {
+                    // Check if any checked todos, and if not, disable clear button
+                    const anyDoneItems = todoList.getCheckedItems().some((x) => x);
+                    clearButton.disabled = !anyDoneItems;   
+                }
             });
         
         // Adds callback for finishing a todo item
@@ -75,13 +83,20 @@
         // Add clear item mechanic
         const clearButton = document.getElementById('clear-done');
         
-        if (clearButton) {
+        if (clearButton) {            
             clearButton.addEventListener("click", function(event) {
                 todoList.removeDoneTodos((id) => {
                     db.get(id).then(function(doc) {
                         return db.remove(doc);
                     })
                 }); 
+            });
+
+            // Add event listener for changes to check to disable the button
+            db.changes({ since: 'now', live: true }).on('change', function() {
+                // Check if there are any checked items
+                const anyDoneItems = todoList.getCheckedItems().some((x) => x);
+                clearButton.disabled = !anyDoneItems;
             });
         }
         // Add submission action
