@@ -20,7 +20,7 @@
 </body>
 <script type="module">
     import TodoList from "./js/app.js";
-    
+
     // Generates a new database entry
     function newEntry(name, age) {
         return {
@@ -46,7 +46,7 @@
         live: true,
         since: 'now'
     };
-    
+
     if (todoList) {
         // Used to render all initial documents
         db.allDocs({ include_docs: true })
@@ -64,10 +64,10 @@
                 if (clearButton) {
                     // Check if any checked todos, and if not, disable clear button
                     const anyDoneItems = todoList.getCheckedItems().some((x) => x);
-                    clearButton.disabled = !anyDoneItems;   
+                    clearButton.disabled = !anyDoneItems;
                 }
             });
-        
+
         // Adds callback for finishing a todo item
         todoList.setCheckTodoCallback(function(id, done) {
             db.get(id).then(function(todo) {
@@ -75,21 +75,21 @@
 
                 // Update element here
                 todoList.updateTodo(todo.name, todo._id, todo.done);
-                
+
                 return db.put(todo);
             })
         })
-            
+
         // Add clear item mechanic
         const clearButton = document.getElementById('clear-done');
-        
-        if (clearButton) {            
+
+        if (clearButton) {
             clearButton.addEventListener("click", function(event) {
                 todoList.removeDoneTodos((id) => {
                     db.get(id).then(function(doc) {
                         return db.remove(doc);
                     })
-                }); 
+                });
             });
 
             // Add event listener for changes to check to disable the button
@@ -108,7 +108,7 @@
                 if (inputField) {
                     let value = document.getElementById('input-name').value;
                     let entry = newEntry(value, Math.random() * 100);
-    
+
                     if (value.length > 0) {
                         db.put(entry)
                             .then(function(d) {
