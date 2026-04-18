@@ -41,6 +41,6 @@ main {
     gap: 0.5rem;
 }
 
-todo-list > fieldset > label {
+todo-list > label {
     font-size: xxx-large;
 }
