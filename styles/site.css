@@ -2,3 +2,45 @@
     background-color: #ae2929;
     border-width: 0px;
 }
+
+html {
+    height: 100%;
+}
+
+h1 {
+    font-size: 4rem !important;
+}
+
+input[type="text"] {
+    font-size: xxx-large;
+    padding: 1em !important;
+}
+
+input[type="checkbox"] {
+    font-size:xxx-large;
+    padding: 0.5em;
+}
+
+label:has(input:checked) {
+    text-decoration-line:line-through;
+    color:darkseagreen;
+}
+
+#add-todo, #clear-done {
+    font-size: xx-large;
+}
+
+.inherit-height {
+    height: inherit;
+}
+
+main {
+    padding: 1em;
+    display: grid !important;
+    grid-template-rows: 5rem auto 5rem;
+    gap: 0.5rem;
+}
+
+todo-list > fieldset > label {
+    font-size: xxx-large;
+}
