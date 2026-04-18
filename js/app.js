@@ -1,14 +1,28 @@
 const randomID = () => {
   const randomTime = new Date().getTime();
   return `${Math.random() * randomTime}`;
-}
+};
+
+const setAttributes = (element, attributes) => {
+  for (var name in attributes) {
+    element.setAttribute(name, attributes[name]);
+  }
+  return element;
+};
 
 const renderTodo = (text, id, checked) => {
-  return `
-    <input type="checkbox" name="${text}" 
-      id="${id}" ${checked ? 'checked' : ''} />
-      ${checked ? `<s>${text}</s>` : `${text}`}`;
-}
+  const inputTag = document.createElement("input");
+  if (checked) {
+    inputTag.setAttribute("checked", true);
+  }
+  const attributes = {
+    id,
+    type: "checkbox",
+    name: text,
+  };
+  setAttributes(inputTag, attributes);
+  return inputTag;
+};
 
 class TodoList extends HTMLElement {
   constructor() {
@@ -46,8 +60,8 @@ class TodoList extends HTMLElement {
   removeTodo(id) {
     const targetChild = this.getRoot().children[id];
 
-    if (targetChild){
-       this.getRoot().removeChild(targetChild); 
+    if (targetChild) {
+      this.getRoot().removeChild(targetChild);
     }
   }
   setCheckTodoCallback(fn) {
@@ -58,8 +72,9 @@ class TodoList extends HTMLElement {
     checkboxLabelContainer.id = id;
 
     let inputId = `${id}-input`;
-    checkboxLabelContainer.innerHTML = renderTodo(item, inputId, checked);
-    let checkbox = checkboxLabelContainer.children[inputId]; 
+    checkboxLabelContainer.appendChild(renderTodo(item, inputId, checked));
+    checkboxLabelContainer.appendChild(document.createTextNode(item));
+    let checkbox = checkboxLabelContainer.children[inputId];
 
     checkbox.addEventListener("change", () => {
       this.checkTodoCallback(id, checkbox.checked);
@@ -75,8 +90,10 @@ class TodoList extends HTMLElement {
     });
   }
   getCheckedItems = () => {
-    return Array.from(this.getRoot().getElementsByTagName("input")).map((x) => x.checked)
-  }
+    return Array.from(this.getRoot().getElementsByTagName("input")).map(
+      (x) => x.checked,
+    );
+  };
 }
 
 export default TodoList;
